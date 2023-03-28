@@ -1,4 +1,6 @@
-use crate::scanner::{comment::Comment, ident::Ident, keyword::Keyword, lit::Lit, punc::Punc};
+use crate::scanner::{
+    comment::Comment, ident::Ident, keyword::Keyword, lit::Lit, punctuator::Punctuator,
+};
 
 #[derive(Debug)]
 pub enum Unit<'s> {
@@ -7,7 +9,7 @@ pub enum Unit<'s> {
     Ident(Ident<'s>),
 
     /// Punctuator
-    Punc(Punc),
+    Punctuator(Punctuator),
 
     /// literal
     Lit(Lit<'s>),

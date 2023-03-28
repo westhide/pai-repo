@@ -24,184 +24,184 @@ macro_rules! unit {
     };
     // Punctuator
     ("!") => {
-        Unit::Punc(Punc::Not)
+        Unit::Punctuator(Punctuator::Not)
     };
     ("!=") => {
-        Unit::Punc(Punc::NotEq)
+        Unit::Punctuator(Punctuator::NotEq)
     };
     ("!==") => {
-        Unit::Punc(Punc::StrictNotEq)
+        Unit::Punctuator(Punctuator::StrictNotEq)
     };
     ("#") => {
-        Unit::Punc(Punc::Hash)
+        Unit::Punctuator(Punctuator::Hash)
     };
     ("#!") => {
-        Unit::Punc(Punc::Hashbang)
+        Unit::Punctuator(Punctuator::Hashbang)
     };
     ("%") => {
-        Unit::Punc(Punc::Mod)
+        Unit::Punctuator(Punctuator::Mod)
     };
     ("%=") => {
-        Unit::Punc(Punc::ModAssign)
+        Unit::Punctuator(Punctuator::ModAssign)
     };
     ("&") => {
-        Unit::Punc(Punc::BitAnd)
+        Unit::Punctuator(Punctuator::BitAnd)
     };
     ("&=") => {
-        Unit::Punc(Punc::BitAndAssign)
+        Unit::Punctuator(Punctuator::BitAndAssign)
     };
     ("&&") => {
-        Unit::Punc(Punc::LogicAnd)
+        Unit::Punctuator(Punctuator::LogicAnd)
     };
     ("&&=") => {
-        Unit::Punc(Punc::LogicAndAssign)
+        Unit::Punctuator(Punctuator::LogicAndAssign)
     };
     ("(") => {
-        Unit::Punc(Punc::LParen)
+        Unit::Punctuator(Punctuator::LParen)
     };
     (")") => {
-        Unit::Punc(Punc::RParen)
+        Unit::Punctuator(Punctuator::RParen)
     };
     ("*") => {
-        Unit::Punc(Punc::Mul)
+        Unit::Punctuator(Punctuator::Mul)
     };
     ("*=") => {
-        Unit::Punc(Punc::MulAssign)
+        Unit::Punctuator(Punctuator::MulAssign)
     };
     ("**") => {
-        Unit::Punc(Punc::Pow)
+        Unit::Punctuator(Punctuator::Pow)
     };
     ("**=") => {
-        Unit::Punc(Punc::PowAssign)
+        Unit::Punctuator(Punctuator::PowAssign)
     };
     ("+") => {
-        Unit::Punc(Punc::Add)
+        Unit::Punctuator(Punctuator::Add)
     };
     ("+=") => {
-        Unit::Punc(Punc::AddAssign)
+        Unit::Punctuator(Punctuator::AddAssign)
     };
     ("++") => {
-        Unit::Punc(Punc::BitInc)
+        Unit::Punctuator(Punctuator::BitInc)
     };
     (",") => {
-        Unit::Punc(Punc::Comma)
+        Unit::Punctuator(Punctuator::Comma)
     };
     ("-") => {
-        Unit::Punc(Punc::Sub)
+        Unit::Punctuator(Punctuator::Sub)
     };
     ("-=") => {
-        Unit::Punc(Punc::SubAssign)
+        Unit::Punctuator(Punctuator::SubAssign)
     };
     ("--") => {
-        Unit::Punc(Punc::BitDec)
+        Unit::Punctuator(Punctuator::BitDec)
     };
     (".") => {
-        Unit::Punc(Punc::Dot)
+        Unit::Punctuator(Punctuator::Dot)
     };
     ("...") => {
-        Unit::Punc(Punc::Ellipsis)
+        Unit::Punctuator(Punctuator::Ellipsis)
     };
     ("/") => {
-        Unit::Punc(Punc::Div)
+        Unit::Punctuator(Punctuator::Div)
     };
     ("/=") => {
-        Unit::Punc(Punc::DivAssign)
+        Unit::Punctuator(Punctuator::DivAssign)
     };
     (":") => {
-        Unit::Punc(Punc::Colon)
+        Unit::Punctuator(Punctuator::Colon)
     };
     (";") => {
-        Unit::Punc(Punc::Semi)
+        Unit::Punctuator(Punctuator::Semi)
     };
     ("<") => {
-        Unit::Punc(Punc::Lt)
+        Unit::Punctuator(Punctuator::Lt)
     };
     ("<=") => {
-        Unit::Punc(Punc::Le)
+        Unit::Punctuator(Punctuator::Le)
     };
     ("<<") => {
-        Unit::Punc(Punc::BitSal)
+        Unit::Punctuator(Punctuator::BitSal)
     };
     ("<<=") => {
-        Unit::Punc(Punc::BitSalAssign)
+        Unit::Punctuator(Punctuator::BitSalAssign)
     };
     ("=") => {
-        Unit::Punc(Punc::Assign)
+        Unit::Punctuator(Punctuator::Assign)
     };
     ("=>") => {
-        Unit::Punc(Punc::Arrow)
+        Unit::Punctuator(Punctuator::Arrow)
     };
     ("==") => {
-        Unit::Punc(Punc::Eq)
+        Unit::Punctuator(Punctuator::Eq)
     };
     ("===") => {
-        Unit::Punc(Punc::StrictEq)
+        Unit::Punctuator(Punctuator::StrictEq)
     };
     (">") => {
-        Unit::Punc(Punc::Gt)
+        Unit::Punctuator(Punctuator::Gt)
     };
     (">=") => {
-        Unit::Punc(Punc::Ge)
+        Unit::Punctuator(Punctuator::Ge)
     };
     (">>") => {
-        Unit::Punc(Punc::BitSar)
+        Unit::Punctuator(Punctuator::BitSar)
     };
     (">>=") => {
-        Unit::Punc(Punc::BitSarAssign)
+        Unit::Punctuator(Punctuator::BitSarAssign)
     };
     (">>>") => {
-        Unit::Punc(Punc::BitShr)
+        Unit::Punctuator(Punctuator::BitShr)
     };
     (">>>=") => {
-        Unit::Punc(Punc::BitShrAssign)
+        Unit::Punctuator(Punctuator::BitShrAssign)
     };
     ("?") => {
-        Unit::Punc(Punc::Question)
+        Unit::Punctuator(Punctuator::Question)
     };
     ("?.") => {
-        Unit::Punc(Punc::OptionalChain)
+        Unit::Punctuator(Punctuator::OptionalChain)
     };
     ("??") => {
-        Unit::Punc(Punc::Coalesce)
+        Unit::Punctuator(Punctuator::Coalesce)
     };
     ("??=") => {
-        Unit::Punc(Punc::CoalesceAssign)
+        Unit::Punctuator(Punctuator::CoalesceAssign)
     };
     ("@") => {
-        Unit::Punc(Punc::At)
+        Unit::Punctuator(Punctuator::At)
     };
     ("[") => {
-        Unit::Punc(Punc::LBracket)
+        Unit::Punctuator(Punctuator::LBracket)
     };
     ("]") => {
-        Unit::Punc(Punc::RBracket)
+        Unit::Punctuator(Punctuator::RBracket)
     };
     ("^") => {
-        Unit::Punc(Punc::BitXor)
+        Unit::Punctuator(Punctuator::BitXor)
     };
     ("^=") => {
-        Unit::Punc(Punc::BitXorAssign)
+        Unit::Punctuator(Punctuator::BitXorAssign)
     };
     ("{") => {
-        Unit::Punc(Punc::LBrace)
+        Unit::Punctuator(Punctuator::LBrace)
     };
     ("}") => {
-        Unit::Punc(Punc::RBrace)
+        Unit::Punctuator(Punctuator::RBrace)
     };
     ("|") => {
-        Unit::Punc(Punc::BitOr)
+        Unit::Punctuator(Punctuator::BitOr)
     };
     ("|=") => {
-        Unit::Punc(Punc::BitOrAssign)
+        Unit::Punctuator(Punctuator::BitOrAssign)
     };
     ("||") => {
-        Unit::Punc(Punc::LogicOr)
+        Unit::Punctuator(Punctuator::LogicOr)
     };
     ("||=") => {
-        Unit::Punc(Punc::LogicOrAssign)
+        Unit::Punctuator(Punctuator::LogicOrAssign)
     };
     ("~") => {
-        Unit::Punc(Punc::BitNot)
+        Unit::Punctuator(Punctuator::BitNot)
     };
 
     // Keyword

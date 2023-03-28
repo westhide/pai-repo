@@ -3,7 +3,7 @@
 // [1]:https://tc39.es/ecma262/#sec-punctuators
 
 declare_enum![
-    NAME: Punc,
+    NAME: Punctuator,
     Not = "!",
     NotEq = "!=",
     StrictNotEq = "!==",

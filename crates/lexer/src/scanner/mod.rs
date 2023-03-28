@@ -9,7 +9,7 @@ pub mod ident;
 pub mod keyword;
 pub mod line;
 pub mod lit;
-pub mod punc;
+pub mod punctuator;
 pub mod unit;
 pub mod whitespace;
 

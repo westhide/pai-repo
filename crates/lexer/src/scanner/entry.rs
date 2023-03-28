@@ -4,7 +4,7 @@ use crate::scanner::{
     comment::Comment,
     ident::Ident,
     keyword::{self, Keyword},
-    punc::Punc,
+    punctuator::Punctuator,
     unit::Unit,
     Scanner,
 };
