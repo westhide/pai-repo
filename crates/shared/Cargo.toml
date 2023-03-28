@@ -1,0 +1,13 @@
+[package]
+name = "pai-shared"
+version = "0.1.0"
+description = "Pai Shared"
+authors = ["westhide <mr.westhide@gmail.com>"]
+repository = "https://github.com/westhide/pai-repo.git"
+license = "MIT"
+edition = "2021"
+
+[lib]
+
+[features]
+default = []
