@@ -1,0 +1,16 @@
+[package]
+name = "pai-fs-loader"
+version = "0.1.0"
+description = "Pai Filesystem Loader"
+authors = ["westhide <mr.westhide@gmail.com>"]
+repository = "https://github.com/westhide/pai-repo.git"
+license = "MIT"
+edition = "2021"
+
+[lib]
+
+[features]
+safe-loader-utf8 = []
+safe-loader = ["safe-loader-utf8"]
+
+default = ["safe-loader"]
