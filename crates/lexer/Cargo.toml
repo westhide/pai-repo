@@ -1,0 +1,29 @@
+[package]
+name = "pai-lexer"
+version = "0.1.0"
+description = "Pai Lexer"
+authors = ["westhide <mr.westhide@gmail.com>"]
+repository = "https://github.com/westhide/pai-repo.git"
+license = "MIT"
+edition = "2021"
+
+[lib]
+
+[features]
+safe-scanner-offset = []
+safe-scanner-peek = []
+safe-scanner-skip = []
+safe-scanner-eat = []
+safe-scanner = [
+    "safe-scanner-offset",
+    "safe-scanner-peek",
+    "safe-scanner-skip",
+    "safe-scanner-eat"
+]
+
+
+default = ["safe-scanner"]
+
+[dependencies]
+pai-shared = { path = "../shared" }
+pai-fs-loader = { path = "../fs-loader" }

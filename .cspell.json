@@ -8,6 +8,7 @@
     "target/**"
   ],
   "words": [
+    "hashbang",
     "instanceof",
     "repr"
   ],
