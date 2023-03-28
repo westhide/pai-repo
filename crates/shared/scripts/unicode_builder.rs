@@ -74,7 +74,7 @@ impl Display for CodePointTable {
         writeln!(f, "[")?;
 
         for CodePointRange { lo, hi } in &self.contents {
-            writeln!(f, "    ('\\u{{{:04X}}}', '\\u{{{:04X}}}'),", lo, hi)?
+            writeln!(f, "    ('\\u{{{lo:04X}}}', '\\u{{{hi:04X}}}'),")?
         }
 
         write!(f, "]")
@@ -186,7 +186,7 @@ impl UnicodeBuilder {
         let properties_text = Self::load(DERIVED_CORE_PROPERTIES_TXT)?;
 
         for property in PROPERTIES {
-            Self::generate_property_table(&properties_text, &property)?;
+            Self::generate_property_table(&properties_text, property)?;
         }
 
         Ok(())
