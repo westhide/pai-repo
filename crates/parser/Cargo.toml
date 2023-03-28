@@ -1,0 +1,8 @@
+[package]
+name = "pai-parser"
+version = "0.1.0"
+description = "Pai Parser"
+authors = ["westhide <mr.westhide@gmail.com>"]
+repository = "https://github.com/westhide/pai-repo.git"
+license = "MIT"
+edition = "2021"
