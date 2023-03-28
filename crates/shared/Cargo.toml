@@ -11,3 +11,6 @@ edition = "2021"
 
 [features]
 default = []
+
+[dependencies]
+thiserror = "1.0.38"
