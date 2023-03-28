@@ -1,0 +1,15 @@
+// cSpell Settings
+// https://cspell.org/
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "node_modules/**",
+    "target/**"
+  ],
+  "words": [
+    "instanceof",
+    "repr"
+  ],
+  "flagWords": []
+}
