@@ -13,14 +13,14 @@ pub type Entry = for<'s> fn(&mut Scanner<'s>) -> Unit<'s>;
 
 #[inline]
 pub fn lookup(index: u8) -> &'static Entry {
-    &BYTE_ENTRY[index as usize]
+    &ENTRY_LOOKUP_TABLE[index as usize]
 }
 
 /// Byte entry lookup table
 /// - [ASCII][1]
 ///
 /// [1]:https://www.rfc-editor.org/rfc/rfc20
-const BYTE_ENTRY: &[Entry; 256] = &[
+const ENTRY_LOOKUP_TABLE: &[Entry; 256] = &[
     // 0  1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
     ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, // 0
     ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, // 1

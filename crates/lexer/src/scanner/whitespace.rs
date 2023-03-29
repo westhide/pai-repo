@@ -18,13 +18,13 @@ pub type Handler = fn(&mut Scanner);
 
 #[inline]
 pub fn lookup(index: u8) -> &'static Option<Handler> {
-    &WHITESPACE_HANDLER[index as usize]
+    &WHITESPACE_LOOKUP_TABLE[index as usize]
 }
 
 /// Whitespace
 ///
 /// [Unicode Whitespace #Zs](https://www.unicode.org/Public/UCD/latest/ucd/PropList.txt)
-const WHITESPACE_HANDLER: &[Option<Handler>; 256] = &[
+const WHITESPACE_LOOKUP_TABLE: &[Option<Handler>; 256] = &[
     // 0  1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
     ___, ___, ___, ___, ___, ___, ___, ___, ___, SPC, NLN, SPC, SPC, NLN, ___, ___, // 0
     ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, // 1

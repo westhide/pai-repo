@@ -9,10 +9,10 @@ pub type Handler = fn(&mut Scanner);
 
 #[inline]
 pub fn lookup(index: u8) -> &'static Handler {
-    &LINE_HANDLER[index as usize]
+    &LINE_TERMINATOR_LOOKUP_TABLE[index as usize]
 }
 
-const LINE_HANDLER: &[Handler; 256] = &[
+const LINE_TERMINATOR_LOOKUP_TABLE: &[Handler; 256] = &[
     // 0  1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
     _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, NLN, _A_, _A_, NLN, _A_, _A_, // 0
     _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, _A_, // 1

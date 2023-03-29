@@ -46,11 +46,11 @@ pub type Handler = fn(&mut Scanner);
 
 #[inline]
 pub fn lookup(index: u8) -> &'static Option<Handler> {
-    &IDENT_PART_HANDLER[index as usize]
+    &IDENT_PART_LOOKUP_TABLE[index as usize]
 }
 
 /// Ident Part
-const IDENT_PART_HANDLER: &[Option<Handler>; 256] = &[
+const IDENT_PART_LOOKUP_TABLE: &[Option<Handler>; 256] = &[
     // 0  1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
     ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, // 0
     ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, ___, // 1
