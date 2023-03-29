@@ -3,6 +3,7 @@ use std::{marker::PhantomData, ops::Range, slice};
 use crate::scanner::{comment::Comment, unit::Unit};
 
 pub mod comment;
+#[allow(clippy::collapsible_else_if)]
 pub mod entry;
 pub mod helpers;
 pub mod ident;
