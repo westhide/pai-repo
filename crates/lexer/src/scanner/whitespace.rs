@@ -114,7 +114,6 @@ const UWS: Option<Handler> = Some(|sn: &mut Scanner| {
 //                 sn.skip_space()
 //             },
 //             0xA8 | 0xA9 => {
-//                 // TODO
 //                 // sn.new_line = true;
 //                 sn.skip(3);
 //                 sn.skip_space()

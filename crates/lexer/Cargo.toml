@@ -10,12 +10,10 @@ edition = "2021"
 [lib]
 
 [features]
-safe-scanner-offset = []
 safe-scanner-peek = []
 safe-scanner-skip = []
 safe-scanner-eat = []
 safe-scanner = [
-    "safe-scanner-offset",
     "safe-scanner-peek",
     "safe-scanner-skip",
     "safe-scanner-eat"

@@ -18,7 +18,7 @@ impl<'s> Scanner<'s> {
 
         // Ascii
         if x <= 0x7F {
-            let ch = unsafe { char::from_u32_unchecked(x) };
+            let ch = char!(x);
 
             return (ch, 1);
         }
@@ -27,8 +27,7 @@ impl<'s> Scanner<'s> {
 
         // UTF8-2
         if x < 0xE0 {
-            let code = (x & 0x1F) << 6 | y;
-            let ch = unsafe { char::from_u32_unchecked(code) };
+            let ch = char!((x & 0x1F) << 6 | y);
 
             return (ch, 2);
         }
@@ -37,8 +36,7 @@ impl<'s> Scanner<'s> {
 
         // UTF8-3
         if x < 0xF0 {
-            let code = (x & 0xF) << 12 | y << 6 | z;
-            let ch = unsafe { char::from_u32_unchecked(code) };
+            let ch = char!((x & 0xF) << 12 | y << 6 | z);
 
             return (ch, 3);
         }
@@ -46,10 +44,23 @@ impl<'s> Scanner<'s> {
         // UTF8-4
         let w = self.peek(3) as u32;
 
-        let code = (x & 0x7) << 18 | y << 12 | z << 6 | w;
-        let ch = unsafe { char::from_u32_unchecked(code) };
+        let ch = char!((x & 0x7) << 18 | y << 12 | z << 6 | w);
 
         (ch, 4)
+    }
+
+    #[inline]
+    pub fn cur_char(&self) -> char {
+        self.decode_char().0
+    }
+
+    #[inline]
+    pub fn cur_ascii(&self) -> Option<char> {
+        if self.cur().is_ascii() {
+            Some(char!(self.cur() as u32))
+        } else {
+            None
+        }
     }
 
     #[inline]

@@ -6,15 +6,13 @@ use crate::scanner::{
 pub enum Unit<'s> {
     Keyword(Keyword),
 
-    Ident(Ident<'s>),
-
     /// Punctuator
     Punctuator(Punctuator),
+
+    Ident(Ident<'s>),
 
     /// literal
     Lit(Lit<'s>),
 
     Comment(Comment<'s>),
-
-    Err,
 }

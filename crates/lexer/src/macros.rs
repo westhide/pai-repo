@@ -18,10 +18,31 @@ macro_rules! declare_enum {
     };
 }
 
+macro_rules! char {
+    ($code_point:expr) => {
+        unsafe { char::from_u32_unchecked($code_point) }
+    };
+}
+
 macro_rules! unit {
+    // Ident
     (Ident: $ident:expr) => {
         Unit::Ident(Ident::new($ident))
     };
+
+    // Number
+    (Number: $num:expr) => {
+        Unit::Lit(Lit::Number($num))
+    };
+
+    (LineComment: $comment:expr) => {
+        Unit::Comment(Comment::Line($comment))
+    };
+
+    (BlockComment: $comment:expr) => {
+        Unit::Comment(Comment::Block($comment))
+    };
+
     // Punctuator
     ("!") => {
         Unit::Punctuator(Punctuator::Not)

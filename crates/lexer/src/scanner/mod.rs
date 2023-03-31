@@ -1,5 +1,7 @@
 use std::{marker::PhantomData, ops::Range, slice};
 
+use pai_shared::Result;
+
 use crate::scanner::{comment::Comment, unit::Unit};
 
 pub mod comment;
@@ -42,14 +44,6 @@ impl<'s> Scanner<'s> {
     #[inline]
     pub fn cur(&self) -> u8 {
         unsafe { *self.ptr }
-    }
-
-    #[inline]
-    pub fn offset(&self, count: usize) -> *const u8 {
-        #[cfg(feature = "safe-scanner-offset")]
-        assert!(count <= self.len());
-
-        unsafe { self.ptr.add(count) }
     }
 
     #[inline]
@@ -131,7 +125,7 @@ impl<'s> Scanner<'s> {
             if self.eat(b'*') && self.eat(b'/') {
                 let end = unsafe { self.ptr.offset(-2) };
 
-                return Unit::Comment(Comment::Block(self.sub_str(start..end)));
+                return unit!(BlockComment: self.sub_str(start..end));
             }
 
             self.skip_char()
@@ -144,7 +138,7 @@ impl<'s> Scanner<'s> {
 }
 
 impl<'s> Scanner<'s> {
-    pub fn next(&mut self) -> Option<Unit> {
+    pub fn next(&mut self) -> Option<Result<Unit>> {
         self.skip_space();
 
         if self.is_empty() {
