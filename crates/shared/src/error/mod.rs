@@ -1,4 +1,4 @@
-use std::{io, result};
+use std::{char, io, num};
 
 use thiserror::Error;
 
@@ -7,8 +7,15 @@ pub enum Error {
     #[error(transparent)]
     IO(#[from] io::Error),
 
-    #[error("Lexer: {0}")]
-    Lexer(String),
-}
+    #[error(transparent)]
+    ParseInt(#[from] num::ParseIntError),
 
-pub type Result<T> = result::Result<T, Error>;
+    #[error(transparent)]
+    ParseFloat(#[from] num::ParseFloatError),
+
+    #[error(transparent)]
+    CharTryFrom(#[from] char::CharTryFromError),
+
+    #[error("{0}")]
+    Info(String),
+}
