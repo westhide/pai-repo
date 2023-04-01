@@ -2,4 +2,8 @@ pub mod decode_char;
 pub mod digit;
 pub mod escape_unicode;
 pub mod hashbang;
+pub mod ident_part;
+pub mod is;
+pub mod line;
 pub mod number;
+pub mod whitespace;

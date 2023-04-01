@@ -1,25 +1,17 @@
-use crate::scanner::{line::is_unicode_line_terminator, Scanner};
+use crate::scanner::{helpers::is, Scanner};
 
-#[inline]
-pub fn is_unicode_space(ch: char) -> bool {
-    matches! {
-        ch,
-        '\u{00A0}'              |
-        '\u{1680}'              |
-        '\u{2000}'..='\u{200A}' |
-        '\u{202F}'              |
-        '\u{205F}'              |
-        '\u{3000}'              |
-        '\u{FEFF}'
+impl<'s> Scanner<'s> {
+    /// # Safety
+    /// !BUG: if invoke in last line of file, will cause endless call stack
+    #[inline]
+    pub fn skip_space(&mut self) {
+        if let Some(f) = WHITESPACE_LOOKUP_TABLE[self.cur() as usize] {
+            f(self)
+        }
     }
 }
 
-pub type Handler = fn(&mut Scanner);
-
-#[inline]
-pub fn lookup(index: u8) -> &'static Option<Handler> {
-    &WHITESPACE_LOOKUP_TABLE[index as usize]
-}
+type Handler = fn(&mut Scanner);
 
 /// Whitespace
 ///
@@ -68,7 +60,7 @@ const NLN: Option<Handler> = Some(|sn: &mut Scanner| {
 const UWS: Option<Handler> = Some(|sn: &mut Scanner| {
     let (ch, width) = sn.decode_char();
 
-    if is_unicode_space(ch) || is_unicode_line_terminator(ch) {
+    if is::unicode_space(ch) || is::unicode_line_terminator(ch) {
         sn.skip(width);
         sn.skip_space()
     }

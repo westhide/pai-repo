@@ -1,16 +1,15 @@
-use crate::scanner::Scanner;
+use crate::scanner::{helpers::is, Scanner};
 
-#[inline]
-pub fn is_unicode_line_terminator(ch: char) -> bool {
-    matches!(ch, '\u{2028}' | '\u{2029}')
+impl<'s> Scanner<'s> {
+    /// # Safety
+    /// !BUG: if invoke in last line of file, will cause endless call stack
+    #[inline]
+    pub fn skip_line(&mut self) {
+        LINE_TERMINATOR_LOOKUP_TABLE[self.cur() as usize](self)
+    }
 }
 
-pub type Handler = fn(&mut Scanner);
-
-#[inline]
-pub fn lookup(index: u8) -> &'static Handler {
-    &LINE_TERMINATOR_LOOKUP_TABLE[index as usize]
-}
+type Handler = fn(&mut Scanner);
 
 const LINE_TERMINATOR_LOOKUP_TABLE: &[Handler; 256] = &[
     // 0  1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -56,7 +55,7 @@ const _U_: Handler = |sn| {
 const UE2: Handler = |sn| {
     let (ch, width) = sn.decode_char();
 
-    if !is_unicode_line_terminator(ch) {
+    if !is::unicode_line_terminator(ch) {
         sn.skip(width);
         sn.skip_line()
     }

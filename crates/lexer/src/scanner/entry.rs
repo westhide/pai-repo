@@ -1,4 +1,4 @@
-use pai_shared::{err, unicode, Result};
+use pai_shared::{err, unicode, PResult};
 
 use crate::scanner::{
     comment::Comment,
@@ -10,7 +10,7 @@ use crate::scanner::{
     Scanner,
 };
 
-pub type Entry = for<'s> fn(&mut Scanner<'s>) -> Result<Unit<'s>>;
+pub type Entry = for<'s> fn(&mut Scanner<'s>) -> PResult<Unit<'s>>;
 
 #[inline]
 pub fn lookup(index: u8) -> &'static Entry {

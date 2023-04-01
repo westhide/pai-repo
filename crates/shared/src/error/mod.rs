@@ -3,7 +3,7 @@ use std::{char, io, num};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum Error {
+pub enum PError {
     #[error(transparent)]
     IO(#[from] io::Error),
 

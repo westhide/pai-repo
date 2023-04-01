@@ -1,10 +1,10 @@
-use pai_shared::{err, Result};
+use pai_shared::{err, PResult};
 
 use crate::scanner::Scanner;
 
 impl<'s> Scanner<'s> {
     /// [DecimalDigit](https://tc39.es/ecma262/#prod-DecimalDigit)
-    pub fn scan_decimal<const DOT: bool>(&mut self) -> Result<bool> {
+    pub fn scan_decimal<const DOT: bool>(&mut self) -> PResult<bool> {
         let mut decimal_point = DOT;
         let mut exponent_part = true;
 
@@ -46,7 +46,7 @@ impl<'s> Scanner<'s> {
     /// - Binary: `0[bB]` [0-1] _? [0-1] n?
     /// - Octal: `0[oO]` [0-7] _? [0-7] n?
     /// - Hex: `0[xX]` [0-F] _? [0-F] n?
-    pub fn scan_radix_int(&mut self, radix: u8) -> Result<bool> {
+    pub fn scan_radix_int(&mut self, radix: u8) -> PResult<bool> {
         if self.is_digit(radix) {
             self.skip(1)
         } else {

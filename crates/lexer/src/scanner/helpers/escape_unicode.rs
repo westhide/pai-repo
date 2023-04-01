@@ -1,10 +1,10 @@
-use pai_shared::{err, Result};
+use pai_shared::{err, PResult};
 
 use crate::scanner::Scanner;
 
 impl<'s> Scanner<'s> {
     /// [UnicodeEscapeSequence](https://tc39.es/ecma262/#prod-UnicodeEscapeSequence)
-    pub fn scan_escape_unicode(&mut self) -> Result<char> {
+    pub fn scan_escape_unicode(&mut self) -> PResult<char> {
         if self.eat(b'{') {
             // [CodePoint](https://tc39.es/ecma262/#prod-CodePoint)
 

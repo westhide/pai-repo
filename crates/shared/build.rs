@@ -6,7 +6,7 @@ mod scripts;
 
 fn main() -> io::Result<()> {
     let Ok(profile) = env::var("PROFILE") else {
-        panic!("env PROFILE error")
+        panic!("env PROFILE Not found")
     };
 
     if profile == "release" {

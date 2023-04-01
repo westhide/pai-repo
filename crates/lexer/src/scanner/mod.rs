@@ -1,6 +1,6 @@
 use std::{marker::PhantomData, ops::Range, slice};
 
-use pai_shared::Result;
+use pai_shared::PResult;
 
 use crate::scanner::{comment::Comment, unit::Unit};
 
@@ -10,11 +10,9 @@ pub mod entry;
 pub mod helpers;
 pub mod ident;
 pub mod keyword;
-pub mod line;
 pub mod lit;
 pub mod punctuator;
 pub mod unit;
-pub mod whitespace;
 
 /// High performance u8 slice scanner, Inspired by from [slice::Iter]
 ///
@@ -94,27 +92,6 @@ impl<'s> Scanner<'s> {
 }
 
 impl<'s> Scanner<'s> {
-    #[inline]
-    pub fn skip_space(&mut self) {
-        if let Some(f) = whitespace::lookup(self.cur()) {
-            f(self)
-        }
-    }
-
-    #[inline]
-    pub fn skip_ident_part(&mut self) {
-        if let Some(f) = ident::lookup(self.cur()) {
-            f(self)
-        }
-    }
-
-    /// # Safety
-    /// !BUG: if invoke in last line of file, will cause endless call stack
-    #[inline]
-    pub fn skip_line(&mut self) {
-        line::lookup(self.cur())(self)
-    }
-
     /// # Safety
     /// !BUG: if block comment unterminated, will cause endless loop
     #[inline]
@@ -134,7 +111,7 @@ impl<'s> Scanner<'s> {
 }
 
 impl<'s> Scanner<'s> {
-    pub fn next(&mut self) -> Option<Result<Unit>> {
+    pub fn next(&mut self) -> Option<PResult<Unit>> {
         self.skip_space();
 
         if self.is_empty() {
