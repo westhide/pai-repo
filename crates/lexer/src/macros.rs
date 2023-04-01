@@ -1,4 +1,3 @@
-/// TODO: Attribute macro
 macro_rules! declare_enum {
     (NAME: $name:ident, $($item:ident=$lit:literal),* $(,)?) => {
         #[derive(Debug, Clone, Copy)]

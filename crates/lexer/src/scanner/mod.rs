@@ -101,18 +101,18 @@ impl<'s> Scanner<'s> {
         }
     }
 
-    /// # Safety
-    /// !BUG: if invoke in last line of file, will cause endless call stack
-    #[inline]
-    pub fn skip_line(&mut self) {
-        line::lookup(self.cur())(self)
-    }
-
     #[inline]
     pub fn skip_ident_part(&mut self) {
         if let Some(f) = ident::lookup(self.cur()) {
             f(self)
         }
+    }
+
+    /// # Safety
+    /// !BUG: if invoke in last line of file, will cause endless call stack
+    #[inline]
+    pub fn skip_line(&mut self) {
+        line::lookup(self.cur())(self)
     }
 
     /// # Safety
@@ -130,10 +130,6 @@ impl<'s> Scanner<'s> {
 
             self.skip_char()
         }
-    }
-
-    pub fn scan_number(&mut self) -> Unit<'s> {
-        todo!()
     }
 }
 
