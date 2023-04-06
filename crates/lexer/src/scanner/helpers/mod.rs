@@ -1,9 +1,10 @@
-pub mod decode_char;
-pub mod digit;
-pub mod escape_unicode;
+pub mod block_comment;
+pub mod char;
+pub mod escape;
 pub mod hashbang;
 pub mod ident_part;
 pub mod is;
 pub mod line;
 pub mod number;
+pub mod string;
 pub mod whitespace;

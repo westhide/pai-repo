@@ -1,19 +1,23 @@
 use pai_shared::{err, PResult};
 
-use crate::scanner::Scanner;
+use crate::scanner::{
+    helpers::is::{Digit, Radix},
+    Scanner,
+};
 
 impl<'s> Scanner<'s> {
     /// [DecimalDigit](https://tc39.es/ecma262/#prod-DecimalDigit)
-    pub fn scan_decimal<const DOT: bool>(&mut self) -> PResult<bool> {
-        let mut decimal_point = DOT;
+    #[inline]
+    pub fn scan_decimal(&mut self, allow_dot: bool) -> PResult<bool> {
+        let mut decimal_point = allow_dot;
         let mut exponent_part = true;
 
         loop {
-            match self.cur() {
+            match self.byte() {
                 b'0'..=b'9' => self.skip(1),
                 b'_' => {
-                    if unsafe { *self.ptr.offset(-1) }.is_ascii_digit() {
-                        self.skip(1)
+                    if self.peek(-1).is_ascii_digit() && self.peek(1).is_ascii_digit() {
+                        self.skip(2)
                     } else {
                         return err!("Invalid Numeric separator");
                     }
@@ -23,11 +27,14 @@ impl<'s> Scanner<'s> {
                     self.skip(1)
                 },
                 b'e' | b'E' if exponent_part => {
-                    if matches!(self.cur(), b'+' | b'-') {
+                    exponent_part = false;
+                    self.skip(1);
+
+                    if matches!(self.byte(), b'+' | b'-') {
                         self.skip(1)
                     }
 
-                    if self.cur().is_ascii_digit() {
+                    if self.byte().is_ascii_digit() {
                         self.skip(1)
                     } else {
                         return err!("Invalid DecimalLiteral ExponentPart");
@@ -46,26 +53,22 @@ impl<'s> Scanner<'s> {
     /// - Binary: `0[bB]` [0-1] _? [0-1] n?
     /// - Octal: `0[oO]` [0-7] _? [0-7] n?
     /// - Hex: `0[xX]` [0-F] _? [0-F] n?
-    pub fn scan_radix_int(&mut self, radix: u8) -> PResult<bool> {
-        if self.is_digit(radix) {
-            self.skip(1)
-        } else {
-            return err!("Invalid {radix} radix digit '{}'", self.cur_char());
-        }
-
+    #[inline]
+    pub fn scan_radix_int(&mut self, radix: Radix) -> PResult<bool> {
         loop {
-            if self.is_digit(radix) {
-                self.skip(1)
-            } else {
-                if self.eat(b'_') {
-                    if self.is_digit(radix) {
-                        self.skip(1);
-                    } else {
-                        return err!("Invalid Numeric separator");
-                    }
+            if self.byte().is_digit(radix) {
+                self.skip(1);
+                continue;
+            }
+
+            if self.byte() == b'_' {
+                if self.peek(-1).is_digit(radix) && self.peek(1).is_digit(radix) {
+                    self.skip(2);
                 } else {
-                    return Ok(self.eat(b'n'));
+                    return err!("Invalid Numeric separator");
                 }
+            } else {
+                return Ok(self.eat(b'n'));
             }
         }
     }

@@ -5,14 +5,14 @@ impl<'s> Scanner<'s> {
     ///
     /// [Hashbang Comments](https://tc39.es/ecma262/#sec-hashbang)
     pub fn scan_hashbang(&mut self) -> Option<&'s str> {
-        if self.cur() == b'#' && self.peek(1) == b'!' {
+        if self.byte() == b'#' && self.peek(1) == b'!' {
             self.skip(2);
 
-            let start = self.ptr;
+            self.mark();
+            self.scan_line();
+            self.down();
 
-            self.skip_line();
-
-            Some(self.sub_str(start..self.ptr))
+            Some(self.raw())
         } else {
             None
         }

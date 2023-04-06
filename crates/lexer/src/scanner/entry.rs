@@ -1,7 +1,8 @@
-use pai_shared::{err, unicode, PResult};
+use pai_shared::{err, PResult};
 
 use crate::scanner::{
     comment::Comment,
+    helpers::is::{Radix, Unicode},
     ident::Ident,
     keyword::{self, Keyword},
     lit::Lit,
@@ -42,28 +43,26 @@ const ENTRY_LOOKUP_TABLE: &[Entry; 256] = &[
 ];
 
 /// Unreachable
-const ___: Entry = |_| unreachable!("Invalid UTF8");
+const ___: Entry = |_| unreachable!("Invalid UTF8 lead byte");
 
 /// Error
 const ERR: Entry = |sn: &mut Scanner| {
     sn.skip(1);
 
-    err!("Invalid char '{}'", char!(sn.cur() as u32))
+    err!("Invalid char '{}'", char!(sn.byte() as u32))
 };
 
 #[inline]
-fn scan_word<'s>(sn: &mut Scanner<'s>, skip_width: usize) -> &'s str {
-    let start = sn.ptr;
-
-    sn.skip(skip_width);
-
-    sn.skip_ident_part();
-
-    sn.sub_str(start..sn.ptr)
+fn ident_word<'s>(sn: &mut Scanner<'s>) -> &'s str {
+    sn.mark();
+    sn.skip(1);
+    sn.scan_ident_part();
+    sn.down();
+    sn.raw()
 }
 
 /// Ident
-const IDT: Entry = |sn: &mut Scanner| Ok(unit!(Ident: scan_word(sn,1)));
+const IDT: Entry = |sn: &mut Scanner| Ok(unit!(Ident: ident_word(sn)));
 
 /// Exclamation
 /// - `!`
@@ -216,8 +215,7 @@ const MIS: Entry = |sn: &mut Scanner| {
 /// Dot
 /// - `.`
 const DOT: Entry = |sn: &mut Scanner| {
-    let start = sn.ptr;
-
+    sn.mark();
     sn.skip(1);
 
     if sn.eat(b'.') {
@@ -227,12 +225,14 @@ const DOT: Entry = |sn: &mut Scanner| {
             err!("Invalid punctuator '..'")
         }
     } else {
-        if sn.cur().is_ascii_digit() {
+        if sn.byte().is_ascii_digit() {
             sn.skip(1);
 
-            sn.scan_decimal::<false>()?;
+            sn.scan_decimal(false)?;
 
-            Ok(unit!(Number: sn.sub_str(start..sn.ptr)))
+            sn.down();
+
+            Ok(unit!(Number: sn.raw()))
         } else {
             Ok(unit!("."))
         }
@@ -244,18 +244,18 @@ const DOT: Entry = |sn: &mut Scanner| {
 const SLH: Entry = |sn: &mut Scanner| {
     sn.skip(1);
 
-    // scan line comment
+    // line comment
     if sn.eat(b'/') {
-        let start = sn.ptr;
+        sn.mark();
+        sn.scan_line();
+        sn.down();
 
-        sn.skip_line();
-
-        return Ok(unit!(LineComment: sn.sub_str(start..sn.ptr)));
+        return Ok(unit!(LineComment: sn.raw()));
     }
 
-    // scan block comment
+    // block comment
     if sn.eat(b'*') {
-        return Ok(sn.scan_block_comment());
+        return sn.scan_block_comment();
     }
 
     if sn.eat(b'=') {
@@ -268,29 +268,30 @@ const SLH: Entry = |sn: &mut Scanner| {
 /// Zero
 /// - `0`
 const ZRO: Entry = |sn: &mut Scanner| {
-    let start = sn.ptr;
-
+    sn.mark();
     sn.skip(1);
 
-    match sn.cur() {
+    match sn.byte() {
         b'x' | b'X' => {
             sn.skip(1);
-            sn.scan_radix_int(16)?;
+            sn.scan_radix_int(Radix::Hex)?;
         },
         b'o' | b'O' => {
             sn.skip(1);
-            sn.scan_radix_int(8)?;
+            sn.scan_radix_int(Radix::Oct)?;
         },
         b'b' | b'B' => {
             sn.skip(1);
-            sn.scan_radix_int(2)?;
+            sn.scan_radix_int(Radix::Bin)?;
         },
         _ => {
-            sn.scan_decimal::<true>()?;
+            sn.scan_decimal(true)?;
         },
     };
 
-    Ok(unit!(Number: sn.sub_str(start..sn.ptr)))
+    sn.down();
+
+    Ok(unit!(Number: sn.raw()))
 };
 
 /// Digit
@@ -298,13 +299,12 @@ const ZRO: Entry = |sn: &mut Scanner| {
 ///
 /// [Numeric Literals](https://tc39.es/ecma262/#sec-literals-numeric-literals)
 const DIG: Entry = |sn: &mut Scanner| {
-    let start = sn.ptr;
-
+    sn.mark();
     sn.skip(1);
+    sn.scan_decimal(true)?;
+    sn.down();
 
-    sn.scan_decimal::<true>()?;
-
-    Ok(unit!(Number: sn.sub_str(start..sn.ptr)))
+    Ok(unit!(Number: sn.raw()))
 };
 
 /// Colon
@@ -515,21 +515,21 @@ const TID: Entry = |sn: &mut Scanner| {
 /// Keyword or Ident
 /// - prefix with `a`..`z`
 const _A_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::AWAIT => unit!("await"),
         ident => unit!(Ident: ident),
     })
 };
 
 const _B_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::BREAK => unit!("break"),
         ident => unit!(Ident: ident),
     })
 };
 
 const _C_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::CASE => unit!("case"),
         keyword::CATCH => unit!("catch"),
         keyword::CLASS => unit!("class"),
@@ -540,7 +540,7 @@ const _C_: Entry = |sn: &mut Scanner| {
 };
 
 const _D_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::DEBUGGER => unit!("debugger"),
         keyword::DEFAULT => unit!("default"),
         keyword::DELETE => unit!("delete"),
@@ -550,7 +550,7 @@ const _D_: Entry = |sn: &mut Scanner| {
 };
 
 const _E_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::ELSE => unit!("else"),
         keyword::ENUM => unit!("enum"),
         keyword::EXPORT => unit!("export"),
@@ -560,7 +560,7 @@ const _E_: Entry = |sn: &mut Scanner| {
 };
 
 const _F_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::FALSE => unit!("false"),
         keyword::FINALLY => unit!("finally"),
         keyword::FOR => unit!("for"),
@@ -574,7 +574,7 @@ const _G_: Entry = IDT;
 const _H_: Entry = IDT;
 
 const _I_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::IF => unit!("if"),
         keyword::IMPORT => unit!("import"),
         keyword::IN => unit!("in"),
@@ -588,7 +588,7 @@ const _J_: Entry = IDT;
 const _K_: Entry = IDT;
 
 const _L_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::LET => unit!("let"),
         ident => unit!(Ident: ident),
     })
@@ -597,7 +597,7 @@ const _L_: Entry = |sn: &mut Scanner| {
 const _M_: Entry = IDT;
 
 const _N_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::NEW => unit!("new"),
         keyword::NULL => unit!("null"),
         ident => unit!(Ident: ident),
@@ -609,14 +609,14 @@ const _P_: Entry = IDT;
 const _Q_: Entry = IDT;
 
 const _R_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::RETURN => unit!("return"),
         ident => unit!(Ident: ident),
     })
 };
 
 const _S_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::SUPER => unit!("super"),
         keyword::SWITCH => unit!("switch"),
         ident => unit!(Ident: ident),
@@ -624,7 +624,7 @@ const _S_: Entry = |sn: &mut Scanner| {
 };
 
 const _T_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::THIS => unit!("this"),
         keyword::THROW => unit!("throw"),
         keyword::TRUE => unit!("true"),
@@ -637,7 +637,7 @@ const _T_: Entry = |sn: &mut Scanner| {
 const _U_: Entry = IDT;
 
 const _V_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::VAR => unit!("var"),
         keyword::VOID => unit!("void"),
         ident => unit!(Ident: ident),
@@ -645,7 +645,7 @@ const _V_: Entry = |sn: &mut Scanner| {
 };
 
 const _W_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::WHILE => unit!("while"),
         keyword::WITH => unit!("with"),
         ident => unit!(Ident: ident),
@@ -655,7 +655,7 @@ const _W_: Entry = |sn: &mut Scanner| {
 const _X_: Entry = IDT;
 
 const _Y_: Entry = |sn: &mut Scanner| {
-    Ok(match scan_word(sn, 1) {
+    Ok(match ident_word(sn) {
         keyword::YIELD => unit!("yield"),
         ident => unit!(Ident: ident),
     })
@@ -665,13 +665,15 @@ const _Z_: Entry = IDT;
 
 /// Unicode start Ident
 const UID: Entry = |sn: &mut Scanner| {
-    let (ch, width) = sn.decode_char();
-
-    if unicode::is_ident_start(ch) {
-        Ok(unit!(Ident: scan_word(sn, width)))
+    if sn.char().is_ident_part() {
+        sn.mark();
+        sn.skip_char();
+        sn.scan_ident_part();
+        sn.down();
+        Ok(unit!(Ident: sn.raw()))
     } else {
-        sn.skip(width);
+        sn.skip_char();
 
-        err!("Invalid Unicode char '{ch}'")
+        err!("Invalid Unicode char")
     }
 };

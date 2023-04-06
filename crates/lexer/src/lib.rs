@@ -7,16 +7,15 @@
 extern crate core;
 extern crate test;
 
+use pai_shared::PResult;
 use scanner::Scanner;
-use token::Token;
-use tokenize::Tokenize;
+
+use crate::scanner::unit::Unit;
 
 #[macro_use]
 pub mod macros;
 
 pub mod scanner;
-pub mod token;
-pub mod tokenize;
 
 #[derive(Debug)]
 pub struct Lexer<'s> {
@@ -30,21 +29,15 @@ impl<'s> Lexer<'s> {
     pub fn new(src: &'s str) -> Self {
         Self {
             src,
-            scanner: Scanner::new(src.as_bytes()),
+            scanner: Scanner::new(src),
         }
     }
 }
 
 impl<'s> Iterator for Lexer<'s> {
-    type Item = Token;
+    type Item = PResult<Unit<'s>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        todo!()
-    }
-}
-
-impl<'s> Tokenize<Lexer<'s>> for &'s str {
-    fn tokenize(self) -> Lexer<'s> {
-        Lexer::new(self)
+        self.scanner.next_unit()
     }
 }

@@ -1,11 +1,11 @@
-use crate::scanner::{helpers::is, Scanner};
+use crate::scanner::{helpers::is::Unicode, Scanner};
 
 impl<'s> Scanner<'s> {
     /// # Safety
     /// !BUG: if invoke in last line of file, will cause endless call stack
     #[inline]
-    pub fn skip_line(&mut self) {
-        LINE_TERMINATOR_LOOKUP_TABLE[self.cur() as usize](self)
+    pub fn scan_line(&mut self) {
+        LINE_TERMINATOR_LOOKUP_TABLE[self.byte() as usize](self)
     }
 }
 
@@ -32,7 +32,7 @@ const LINE_TERMINATOR_LOOKUP_TABLE: &[Handler; 256] = &[
 ];
 
 /// Unreachable
-const ___: Handler = |_| unreachable!("Invalid UTF8");
+const ___: Handler = |_| unreachable!("Invalid UTF8 lead byte");
 
 /// New line
 const NLN: Handler = |_| {};
@@ -40,23 +40,21 @@ const NLN: Handler = |_| {};
 // ASCII
 const _A_: Handler = |sn| {
     sn.skip(1);
-    sn.skip_line()
+    sn.scan_line()
 };
 
 // Unicode
 const _U_: Handler = |sn| {
     sn.skip_char();
-    sn.skip_line()
+    sn.scan_line()
 };
 
 /// Unicode line terminator
 /// - `U+2028` : `[0xE2, 0x80, 0xA8]`
 /// - `U+2029` : `[0xE2, 0x80, 0xA9]`
 const UE2: Handler = |sn| {
-    let (ch, width) = sn.decode_char();
-
-    if !is::unicode_line_terminator(ch) {
-        sn.skip(width);
-        sn.skip_line()
+    if !sn.char().is_line_terminator() {
+        sn.skip_char();
+        sn.scan_line()
     }
 };

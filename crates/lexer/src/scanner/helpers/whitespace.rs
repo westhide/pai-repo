@@ -1,12 +1,12 @@
-use crate::scanner::{helpers::is, Scanner};
+use crate::scanner::{helpers::is::Unicode, Scanner};
 
 impl<'s> Scanner<'s> {
     /// # Safety
     /// !BUG: if invoke in last line of file, will cause endless call stack
     #[inline]
     pub fn skip_space(&mut self) {
-        if let Some(f) = WHITESPACE_LOOKUP_TABLE[self.cur() as usize] {
-            f(self)
+        if let Some(handler) = WHITESPACE_LOOKUP_TABLE[self.byte() as usize] {
+            handler(self)
         }
     }
 }
@@ -58,10 +58,8 @@ const NLN: Option<Handler> = Some(|sn: &mut Scanner| {
 
 /// Unicode Whitespace
 const UWS: Option<Handler> = Some(|sn: &mut Scanner| {
-    let (ch, width) = sn.decode_char();
-
-    if is::unicode_space(ch) || is::unicode_line_terminator(ch) {
-        sn.skip(width);
+    if sn.char().is_space() || sn.char().is_line_terminator() {
+        sn.skip_char();
         sn.skip_space()
     }
 });

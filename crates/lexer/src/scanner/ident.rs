@@ -1,6 +1,4 @@
-use pai_shared::unicode;
-
-use crate::scanner::helpers::is;
+use crate::scanner::helpers::is::Unicode;
 
 /// [ECMA IdentifierName][1]
 ///
@@ -28,7 +26,7 @@ impl Identifier for char {
         if matches!(*self, 'a'..='z' | 'A'..='Z' | '_' | '$') {
             true
         } else {
-            unicode::is_ident_start(*self)
+            Unicode::is_ident_start(self)
         }
     }
 
@@ -37,7 +35,7 @@ impl Identifier for char {
         if matches!(*self, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '$') {
             true
         } else {
-            is::unicode_ident_part(*self)
+            Unicode::is_ident_part(self)
         }
     }
 }

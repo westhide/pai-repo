@@ -1,12 +1,12 @@
-use crate::scanner::{helpers::is, Scanner};
+use crate::scanner::{helpers::is::Unicode, Scanner};
 
 impl<'s> Scanner<'s> {
     /// # Safety
     /// !BUG: if invoke in last line of file, will cause endless call stack
     #[inline]
-    pub fn skip_ident_part(&mut self) {
-        if let Some(f) = IDENT_PART_LOOKUP_TABLE[self.cur() as usize] {
-            f(self)
+    pub fn scan_ident_part(&mut self) {
+        if let Some(handler) = IDENT_PART_LOOKUP_TABLE[self.byte() as usize] {
+            handler(self)
         }
     }
 }
@@ -44,16 +44,14 @@ const ___: Option<Handler> = None;
 /// - `_`
 const IDT: Option<Handler> = Some(|sn: &mut Scanner| {
     sn.skip(1);
-    sn.skip_ident_part()
+    sn.scan_ident_part()
 });
 
 /// Unicode Ident Part
 const UIP: Option<Handler> = Some(|sn: &mut Scanner| {
-    let (ch, width) = sn.decode_char();
-
-    if is::unicode_ident_part(ch) {
-        sn.skip(width);
-        sn.skip_ident_part()
+    if sn.char().is_ident_part() {
+        sn.skip_char();
+        sn.scan_ident_part()
     }
 });
 

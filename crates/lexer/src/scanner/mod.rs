@@ -1,8 +1,8 @@
-use std::{marker::PhantomData, ops::Range, slice};
+use std::{marker::PhantomData, slice};
 
 use pai_shared::PResult;
 
-use crate::scanner::{comment::Comment, unit::Unit};
+use crate::scanner::unit::Unit;
 
 pub mod comment;
 #[allow(clippy::collapsible_else_if)]
@@ -14,42 +14,50 @@ pub mod lit;
 pub mod punctuator;
 pub mod unit;
 
-/// High performance u8 slice scanner, Inspired by from [slice::Iter]
+/// High performance u8 slice scanner, Inspired by [slice::Iter]
 ///
 /// # Safety
 #[derive(Debug)]
 pub struct Scanner<'s> {
     ptr: *const u8,
     end: *const u8,
+
+    lo: *const u8,
+    hi: *const u8,
+
     _marker: PhantomData<&'s u8>,
 }
 
 impl<'s> Scanner<'s> {
-    pub fn new(slice: &'s [u8]) -> Self {
-        // SAFETY: slice guaranteed ptr and end is valid
+    pub fn new(s: &'s str) -> Self {
+        // SAFETY: &str guaranteed ptr and end is valid
         unsafe {
-            let ptr = slice.as_ptr();
-            let end = ptr.add(slice.len());
+            let ptr = s.as_ptr();
+            let end = ptr.add(s.len());
 
             Self {
                 ptr,
                 end,
+                lo: ptr,
+                hi: ptr,
                 _marker: PhantomData,
             }
         }
     }
 
     #[inline]
-    pub fn cur(&self) -> u8 {
+    pub fn byte(&self) -> u8 {
         unsafe { *self.ptr }
     }
 
     #[inline]
-    pub fn peek(&self, count: usize) -> u8 {
+    pub fn peek(&self, count: isize) -> u8 {
+        // !FIX
+        // remove this
         #[cfg(feature = "safe-scanner-peek")]
-        assert!(count <= self.len());
+        assert!(count <= self.len() as isize);
 
-        unsafe { *self.ptr.add(count) }
+        unsafe { *self.ptr.offset(count) }
     }
 
     #[inline]
@@ -57,27 +65,24 @@ impl<'s> Scanner<'s> {
         #[cfg(feature = "safe-scanner-skip")]
         assert!(count <= self.len());
 
-        unsafe { self.ptr = self.ptr.add(count) };
+        unsafe { self.ptr = self.ptr.add(count) }
     }
 
     #[inline]
     pub fn eat(&mut self, byte: u8) -> bool {
+        // !FIX
+        // remove this
         #[cfg(feature = "safe-scanner-eat")]
         if self.is_empty() {
             return false;
         }
 
-        if self.cur() == byte {
+        if self.byte() == byte {
             self.skip(1);
             true
         } else {
             false
         }
-    }
-
-    #[inline]
-    pub fn sub_str(&self, range: Range<*const u8>) -> &'s str {
-        unsafe { std::str::from_utf8_unchecked(slice::from_ptr_range(range)) }
     }
 
     #[inline]
@@ -92,34 +97,30 @@ impl<'s> Scanner<'s> {
 }
 
 impl<'s> Scanner<'s> {
-    /// # Safety
-    /// !BUG: if block comment unterminated, will cause endless loop
     #[inline]
-    pub fn scan_block_comment(&mut self) -> Unit<'s> {
-        let start = self.ptr;
+    pub fn mark(&mut self) {
+        self.lo = self.ptr
+    }
 
-        loop {
-            if self.eat(b'*') && self.eat(b'/') {
-                let end = unsafe { self.ptr.offset(-2) };
+    #[inline]
+    pub fn down(&mut self) {
+        self.hi = self.ptr
+    }
 
-                return unit!(BlockComment: self.sub_str(start..end));
-            }
-
-            self.skip_char()
-        }
+    #[inline]
+    pub fn raw(&self) -> &'s str {
+        unsafe { std::str::from_utf8_unchecked(slice::from_ptr_range(self.lo..self.hi)) }
     }
 }
 
 impl<'s> Scanner<'s> {
-    pub fn next(&mut self) -> Option<PResult<Unit>> {
+    pub fn next_unit(&mut self) -> Option<PResult<Unit<'s>>> {
         self.skip_space();
 
         if self.is_empty() {
             None
         } else {
-            let f = entry::lookup(self.cur());
-
-            Some(f(self))
+            Some(entry::lookup(self.byte())(self))
         }
     }
 }

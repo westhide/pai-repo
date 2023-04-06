@@ -5,7 +5,7 @@ impl<'s> Scanner<'s> {
     ///
     /// Inspired by [core::str::next_code_point]
     #[inline]
-    pub fn decode_char(&self) -> (char, usize) {
+    pub fn char(&self) -> char {
         // | Char. number range      | UTF-8 octet sequence                |
         // |-------------------------|-------------------------------------|
         // | Hex Unicode             | Binary UTF8 byte                    |
@@ -14,57 +14,35 @@ impl<'s> Scanner<'s> {
         // | U+0800...U+FFFF         | 1110xxxx 10yyyyyy 10zzzzzz          |
         // | U+10000...U+10FFFF      | 11110xxx 10yyyyyy 10zzzzzz 10wwwwww |
 
-        let x = self.cur() as u32;
+        let x = self.byte() as u32;
 
         // Ascii
-        if x <= 0x7F {
-            let ch = char!(x);
-
-            return (ch, 1);
+        if x < 0x80 {
+            return char!(x);
         }
 
         let y = self.peek(1) as u32;
 
         // UTF8-2
         if x < 0xE0 {
-            let ch = char!((x & 0x1F) << 6 | y);
-
-            return (ch, 2);
+            return char!((x & 0x1F) << 6 | y);
         }
 
         let z = self.peek(2) as u32;
 
         // UTF8-3
         if x < 0xF0 {
-            let ch = char!((x & 0xF) << 12 | y << 6 | z);
-
-            return (ch, 3);
+            return char!((x & 0xF) << 12 | y << 6 | z);
         }
 
         // UTF8-4
         let w = self.peek(3) as u32;
 
-        let ch = char!((x & 0x7) << 18 | y << 12 | z << 6 | w);
-
-        (ch, 4)
-    }
-
-    #[inline]
-    pub fn cur_char(&self) -> char {
-        self.decode_char().0
-    }
-
-    #[inline]
-    pub fn cur_ascii(&self) -> Option<char> {
-        if self.cur().is_ascii() {
-            Some(char!(self.cur() as u32))
-        } else {
-            None
-        }
+        char!((x & 0x7) << 18 | y << 12 | z << 6 | w)
     }
 
     #[inline]
     pub fn skip_char(&mut self) {
-        self.skip(core::str::utf8_char_width(self.cur()))
+        self.skip(core::str::utf8_char_width(self.byte()))
     }
 }
