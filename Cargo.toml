@@ -2,6 +2,7 @@
 members = ["crates/*"]
 
 [workspace.dependencies]
+dhat = "0.3.2"
 insta = "1.26.0"
 
 [profile.release]
@@ -9,3 +10,5 @@ opt-level = 3
 strip = "symbols"
 lto = true
 codegen-units = 1
+
+debug = true
